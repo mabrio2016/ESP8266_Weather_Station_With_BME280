@@ -1,3 +1,6 @@
+
+//Use Board NodeMCU (esp12-module)
+
 #include <ESP8266WebServer.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
