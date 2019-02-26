@@ -10,6 +10,7 @@
 
 Adafruit_BME280 bme;
 
+//float temperature, humidity, pressure, altitude;
 float temperature, humidity, pressure, altitude;
 
 /*Put your SSID & Password*/
@@ -54,15 +55,17 @@ void handle_OnConnect() {
   temperature = bme.readTemperature();
   humidity = bme.readHumidity();
   pressure = bme.readPressure() / 100.0F;
-  altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
-  server.send(200, "text/html", SendHTML(temperature,humidity,pressure,altitude)); 
+  //altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
+  //server.send(200, "text/html", SendHTML(temperature,humidity,pressure,altitude));
+  server.send(200, "text/html", SendHTML(temperature,humidity,pressure)); 
 }
 
 void handle_NotFound(){
   server.send(404, "text/plain", "Not found");
 }
 
-String SendHTML(float temperature,float humidity,float pressure,float altitude){
+//String SendHTML(float temperature,float humidity,float pressure,float altitude){
+String SendHTML(float temperature,float humidity,float pressure){
   String ptr = "<!DOCTYPE html>";
   ptr +="<html>";
   ptr +="<head>";
@@ -80,7 +83,7 @@ String SendHTML(float temperature,float humidity,float pressure,float altitude){
   ptr +=".temperature .reading{color: #F29C1F;}";
   ptr +=".humidity .reading{color: #3B97D3;}";
   ptr +=".pressure .reading{color: #26B99A;}";
-  ptr +=".altitude .reading{color: #955BA5;}";
+  //ptr +=".altitude .reading{color: #955BA5;}";
   ptr +=".superscript{font-size: 17px;font-weight: 600;position: absolute;top: 10px;}";
   ptr +=".data{padding: 10px;}";
   ptr +=".container{display: table;margin: 0 auto;}";
@@ -132,20 +135,20 @@ String SendHTML(float temperature,float humidity,float pressure,float altitude){
   ptr +=(int)pressure;
   ptr +="<span class='superscript'>hPa</span></div>";
   ptr +="</div>";
-  ptr +="<div class='data altitude'>";
-  ptr +="<div class='side-by-side icon'>";
-  ptr +="<svg enable-background='new 0 0 58.422 40.639'height=40.639px id=Layer_1 version=1.1 viewBox='0 0 58.422 40.639'width=58.422px x=0px xml:space=preserve xmlns=http://www.w3.org/2000/svg xmlns:xlink=http://www.w3.org/1999/xlink y=0px><g><path d='M58.203,37.754l0.007-0.004L42.09,9.935l-0.001,0.001c-0.356-0.543-0.969-0.902-1.667-0.902";
-  ptr +="c-0.655,0-1.231,0.32-1.595,0.808l-0.011-0.007l-0.039,0.067c-0.021,0.03-0.035,0.063-0.054,0.094L22.78,37.692l0.008,0.004";
-  ptr +="c-0.149,0.28-0.242,0.594-0.242,0.934c0,1.102,0.894,1.995,1.994,1.995v0.015h31.888c1.101,0,1.994-0.893,1.994-1.994";
-  ptr +="C58.422,38.323,58.339,38.024,58.203,37.754z'fill=#955BA5 /><path d='M19.704,38.674l-0.013-0.004l13.544-23.522L25.13,1.156l-0.002,0.001C24.671,0.459,23.885,0,22.985,0";
-  ptr +="c-0.84,0-1.582,0.41-2.051,1.038l-0.016-0.01L20.87,1.114c-0.025,0.039-0.046,0.082-0.068,0.124L0.299,36.851l0.013,0.004";
-  ptr +="C0.117,37.215,0,37.62,0,38.059c0,1.412,1.147,2.565,2.565,2.565v0.015h16.989c-0.091-0.256-0.149-0.526-0.149-0.813";
-  ptr +="C19.405,39.407,19.518,39.019,19.704,38.674z'fill=#955BA5 /></g></svg>";
-  ptr +="</div>";
-  ptr +="<div class='side-by-side text'>Altitude</div>";
-  ptr +="<div class='side-by-side reading'>";
-  ptr +=(int)altitude;
-  ptr +="<span class='superscript'>m</span></div>";
+  //ptr +="<div class='data altitude'>";
+  //  ptr +="<div class='side-by-side icon'>";
+  //  ptr +="<svg enable-background='new 0 0 58.422 40.639'height=40.639px id=Layer_1 version=1.1 viewBox='0 0 58.422 40.639'width=58.422px x=0px xml:space=preserve xmlns=http://www.w3.org/2000/svg xmlns:xlink=http://www.w3.org/1999/xlink y=0px><g><path d='M58.203,37.754l0.007-0.004L42.09,9.935l-0.001,0.001c-0.356-0.543-0.969-0.902-1.667-0.902";
+  //  ptr +="c-0.655,0-1.231,0.32-1.595,0.808l-0.011-0.007l-0.039,0.067c-0.021,0.03-0.035,0.063-0.054,0.094L22.78,37.692l0.008,0.004";
+  //  ptr +="c-0.149,0.28-0.242,0.594-0.242,0.934c0,1.102,0.894,1.995,1.994,1.995v0.015h31.888c1.101,0,1.994-0.893,1.994-1.994";
+  //  ptr +="C58.422,38.323,58.339,38.024,58.203,37.754z'fill=#955BA5 /><path d='M19.704,38.674l-0.013-0.004l13.544-23.522L25.13,1.156l-0.002,0.001C24.671,0.459,23.885,0,22.985,0";
+  //  ptr +="c-0.84,0-1.582,0.41-2.051,1.038l-0.016-0.01L20.87,1.114c-0.025,0.039-0.046,0.082-0.068,0.124L0.299,36.851l0.013,0.004";
+  //  ptr +="C0.117,37.215,0,37.62,0,38.059c0,1.412,1.147,2.565,2.565,2.565v0.015h16.989c-0.091-0.256-0.149-0.526-0.149-0.813";
+  //  ptr +="C19.405,39.407,19.518,39.019,19.704,38.674z'fill=#955BA5 /></g></svg>";
+  //  ptr +="</div>";
+  //ptr +="<div class='side-by-side text'>Altitude</div>";
+  //ptr +="<div class='side-by-side reading'>";
+  //ptr +=(int)altitude;
+  //ptr +="<span class='superscript'>m</span></div>";
   ptr +="</div>";
   ptr +="</div>";
   ptr +="</body>";
