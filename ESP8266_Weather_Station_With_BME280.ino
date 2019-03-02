@@ -119,7 +119,7 @@ void loop() {
 void handle_OnConnect() {
   temperature = bme.readTemperature();
   humidity = bme.readHumidity();
-  pressure = bme.readPressure() / 100.0F
+  pressure = bme.readPressure() / 100.0F;
   yield();
   //altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
   //server.send(200, "text/html", SendHTML(temperature,humidity,pressure,altitude));
