@@ -6,6 +6,10 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1331.h>
+#include <SPI.h>
+
 #define SEALEVELPRESSURE_HPA (1013.25)
 
 Adafruit_BME280 bme;
@@ -17,14 +21,69 @@ float temperature, humidity, pressure, altitude;
 const char* ssid = "MM";  // Enter SSID here
 const char* password = "lobstertail1!";  //Enter Password here
 
-ESP8266WebServer server(80);              
+//Use Board NodeMCU (esp12-module)
+//Node-MCU ESP8266 GPIO pins and Pin lables
+#define sclk 14 // D5
+#define mosi 13 // D7
+#define cs   15 // D8
+#define rst  16 // D0
+#define dc   2  // D4
+
+// Color definitions
+#define BLACK           0x0000
+#define BLUE            0x001F
+#define RED             0xF800
+#define GREEN           0x07E0
+#define CYAN            0x07FF
+#define MAGENTA         0xF81F
+#define YELLOW          0xFFE0  
+#define WHITE           0xFFFF
+
+// 'icons8-temperature-24', 17x18px
+const unsigned char Thermomiter1 [] PROGMEM = {
+  0x01, 0xc0, 0x00, 0x03, 0xe0, 0x00, 0x02, 0x20, 0x00, 0x02, 0x20, 0x00, 0x02, 0xb8, 0x00, 0x02, 
+  0xa0, 0x00, 0x02, 0xb8, 0x00, 0x02, 0xb0, 0x00, 0x02, 0xa0, 0x00, 0x06, 0xb0, 0x00, 0x0d, 0xd8, 
+  0x00, 0x0b, 0xe8, 0x00, 0x0b, 0xe8, 0x00, 0x0b, 0xe8, 0x00, 0x09, 0xc8, 0x00, 0x0c, 0x18, 0x00, 
+  0x07, 0xf0, 0x00, 0x01, 0xc0, 0x00
+};
+// 'icons8-blur-30', 16x18px
+const unsigned char Thermomiter2 [] PROGMEM = {
+  0x00, 0x00, 0x01, 0x80, 0x03, 0x80, 0x03, 0xc0, 0x07, 0xc0, 0x07, 0xe0, 0x0f, 0xe0, 0x0f, 0xf0, 
+  0x0f, 0xf0, 0x1f, 0xf0, 0x1f, 0xf8, 0x17, 0xf8, 0x13, 0xf0, 0x0b, 0xf0, 0x0d, 0xf0, 0x07, 0xe0, 
+  0x01, 0x80, 0x00, 0x00
+};
+// 'icons8-speedometer-50', 18x20px
+const unsigned char Thermomiter3 [] PROGMEM = {
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0xd8, 0x00, 0x0c, 0x0c, 0x00, 0x10, 0x02, 0x00, 0x20, 
+  0x01, 0x00, 0x20, 0x01, 0x00, 0x40, 0x00, 0x80, 0x00, 0x18, 0x80, 0x00, 0xf0, 0x00, 0x41, 0x20, 
+  0x80, 0x01, 0x20, 0x00, 0x00, 0xc0, 0x00, 0x40, 0x00, 0x80, 0x20, 0x01, 0x00, 0x20, 0x01, 0x00, 
+  0x07, 0xf8, 0x00, 0x04, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+
+Adafruit_SSD1331 display = Adafruit_SSD1331(cs, dc, rst);
+
+ESP8266WebServer server(80); 
+
  
 void setup() {
+
+  
+  //display.fillScreen(BLACK);
+  
+//  display.setCursor(0, 5);
+//  display.setTextColor(RED);  
+//  display.setTextSize(2);
+//  display.println("Marco");
+//  display.println("Weather Station");
+//  delay(2000);
+  
+  bme.begin(0x76);
+  
   Serial.begin(115200);
   delay(100);
   
-  bme.begin(0x76);   
-
+    
+  
   Serial.println("Connecting to ");
   Serial.println(ssid);
 
@@ -44,17 +103,24 @@ void setup() {
   server.onNotFound(handle_NotFound);
 
   server.begin();
-  Serial.println("HTTP server started");
+  ESP.wdtFeed();
+  Serial.println("HTTP server started"); 
 
 }
+
+
 void loop() {
   server.handleClient();
+  yield();
+  //ESP.wdtFeed();
+  display.fillScreen(BLACK);
 }
 
 void handle_OnConnect() {
   temperature = bme.readTemperature();
   humidity = bme.readHumidity();
-  pressure = bme.readPressure() / 100.0F;
+  pressure = bme.readPressure() / 100.0F
+  yield();
   //altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
   //server.send(200, "text/html", SendHTML(temperature,humidity,pressure,altitude));
   server.send(200, "text/html", SendHTML(temperature,humidity,pressure)); 
@@ -70,7 +136,7 @@ String SendHTML(float temperature,float humidity,float pressure){
   ptr +="<html>";
   ptr +="<head>";
   ptr +="<meta http-equiv= refresh content= 2 >\n";  // Auto Page Refresh
-  ptr +="<title>ESP8266 Weather Station</title>";
+  ptr +="<title>Marco Weather Station</title>";
   ptr +="<meta name='viewport' content='width=device-width, initial-scale=1.0'>";
   ptr +="<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,600' rel='stylesheet'>";
   ptr +="<style>";
@@ -91,7 +157,7 @@ String SendHTML(float temperature,float humidity,float pressure){
   ptr +="</style>";
   ptr +="</head>";
   ptr +="<body>";
-  ptr +="<h1>ESP8266 Weather Station</h1>";
+  ptr +="<h1>Marco Weather Station</h1>";
   ptr +="<div class='container'>";
   ptr +="<div class='data temperature'>";
   ptr +="<div class='side-by-side icon'>";
