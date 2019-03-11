@@ -5,9 +5,14 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
+//---Adafrute OLED Display drive does not work with ESP8266WebServer---//
 //#include <Adafruit_GFX.h>
 //#include <Adafruit_SSD1331.h>
 //#include <SPI.h>
+
+#include "ssd1306.h"
+#include "nano_engine.h"
+
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
@@ -64,7 +69,13 @@ ESP8266WebServer server(80);
               
  
 void setup() {
-  //display.fillScreen(BLACK);
+  ssd1331_96x64_spi_init(16, 15, 02); // Use this line for ESP32 (VSPI)  (gpio16=RST, gpio5=CS for VSPI, gpio17=DC)
+  ssd1306_setMode( LCD_MODE_NORMAL );
+  ssd1306_clearScreen8();
+  ssd1306_setFixedFont(ssd1306xled_font6x8);
+  ssd1306_setColor(RGB_COLOR8(255,255,0));
+  ssd1306_printFixed8(0,  0, "Marco Test", STYLE_NORMAL);
+  
   ESP.wdtDisable();
   Serial.begin(115200);
   delay(100);
@@ -95,19 +106,16 @@ void setup() {
   server.begin();
   Serial.println("HTTP server started");
   delay(1);
-  //display.fillScreen(BLACK);
+  
   delay(1);
 }
 void loop() {
-  server.send(200, "text/html", SendHTML(temperature,humidity,pressure));
-  delay(1);
-  server.handleClient();
-  delay(1);
-  //display.fillScreen(BLACK);
-  delay(1);
-}
+    server.send(200, "text/html", SendHTML(temperature,humidity,pressure));
+    server.handleClient();
+  }
 
 void handle_OnConnect() {
+  //yield(); 
   temperature = bme1.readTemperature();
   humidity = bme1.readHumidity();
   pressure = bme1.readPressure() / 100.0F;
