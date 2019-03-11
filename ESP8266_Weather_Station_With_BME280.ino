@@ -1,3 +1,4 @@
+
 //Use Board NodeMCU (esp12-module)
 
 #include <ESP8266WebServer.h>
@@ -5,18 +6,12 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
-//---Adafrute OLED Display drive does not work with ESP8266WebServer---//
-//#include <Adafruit_GFX.h>
-//#include <Adafruit_SSD1331.h>
-//#include <SPI.h>
-
 #include "ssd1306.h"
 #include "nano_engine.h"
 
-
 #define SEALEVELPRESSURE_HPA (1013.25)
 
-Adafruit_BME280 bme1;
+Adafruit_BME280 bme;
 Adafruit_BME280 bme2;
 
 //float temperature, humidity, pressure, altitude;
@@ -26,49 +21,10 @@ float temperature, humidity, pressure, altitude;
 const char* ssid = "MM";  // Enter SSID here
 const char* password = "lobstertail1!";  //Enter Password here
 
-////--Disply--//
-////Use Board NodeMCU (esp12-module)
-////Node-MCU ESP8266 GPIO pins and Pin lables
-//#define sclk 14 // D5
-//#define mosi 13 // D7
-//#define cs   15 // D8
-//#define rst  16 // D0
-//#define dc   2  // D4
-//
-//// Color definitions
-//#define BLACK           0x0000
-//#define BLUE            0x001F
-//#define RED             0xF800
-//#define GREEN           0x07E0
-//#define CYAN            0x07FF
-//#define MAGENTA         0xF81F
-//#define YELLOW          0xFFE0  
-//#define WHITE           0xFFFF
-
-//// 'icons8-temperature-24', 17x18px
-//const unsigned char Thermomiter1 [] PROGMEM = {
-//  0x01, 0xc0, 0x00, 0x03, 0xe0, 0x00, 0x02, 0x20, 0x00, 0x02, 0x20, 0x00, 0x02, 0xb8, 0x00, 0x02, 
-//  0xa0, 0x00, 0x02, 0xb8, 0x00, 0x02, 0xb0, 0x00, 0x02, 0xa0, 0x00, 0x06, 0xb0, 0x00, 0x0d, 0xd8, 
-//  0x00, 0x0b, 0xe8, 0x00, 0x0b, 0xe8, 0x00, 0x0b, 0xe8, 0x00, 0x09, 0xc8, 0x00, 0x0c, 0x18, 0x00, 
-//  0x07, 0xf0, 0x00, 0x01, 0xc0, 0x00
-//};
-//// 'icons8-blur-30', 16x18px
-//const unsigned char Thermomiter2 [] PROGMEM = {
-//  0x00, 0x00, 0x01, 0x80, 0x03, 0x80, 0x03, 0xc0, 0x07, 0xc0, 0x07, 0xe0, 0x0f, 0xe0, 0x0f, 0xf0, 
-//  0x0f, 0xf0, 0x1f, 0xf0, 0x1f, 0xf8, 0x17, 0xf8, 0x13, 0xf0, 0x0b, 0xf0, 0x0d, 0xf0, 0x07, 0xe0, 
-//  0x01, 0x80, 0x00, 0x00
-//};
-
-
-//Adafruit_SSD1331 display = Adafruit_SSD1331(cs, dc, rst);
-
-
-
-ESP8266WebServer server(80);
-
-              
+ESP8266WebServer server(80);              
  
 void setup() {
+  
   ssd1331_96x64_spi_init(16, 15, 02); // Use this line for ESP32 (VSPI)  (gpio16=RST, gpio5=CS for VSPI, gpio17=DC)
   ssd1306_setMode( LCD_MODE_NORMAL );
   ssd1306_clearScreen8();
@@ -76,20 +32,17 @@ void setup() {
   ssd1306_setColor(RGB_COLOR8(255,255,0));
   ssd1306_printFixed8(0,  0, "Marco Test", STYLE_NORMAL);
   
-  ESP.wdtDisable();
   Serial.begin(115200);
   delay(100);
-
-  bme1.begin(0x76);
-  bme2.begin(0x77);
-  //yield();   
+  
+  bme.begin(0x76); 
+  bme2.begin(0x77);  
 
   Serial.println("Connecting to ");
   Serial.println(ssid);
 
   //connect to your local wi-fi network
   WiFi.begin(ssid, password);
-  //yield();
 
   //check wi-fi is connected to wi-fi network
   while (WiFi.status() != WL_CONNECTED) {
@@ -105,25 +58,19 @@ void setup() {
 
   server.begin();
   Serial.println("HTTP server started");
-  delay(1);
-  
-  delay(1);
+
 }
 void loop() {
-    server.send(200, "text/html", SendHTML(temperature,humidity,pressure));
-    server.handleClient();
-  }
+  server.handleClient();
+}
 
 void handle_OnConnect() {
-  //yield(); 
-  temperature = bme1.readTemperature();
-  humidity = bme1.readHumidity();
-  pressure = bme1.readPressure() / 100.0F;
-  delay(1);
+  temperature = bme.readTemperature();
+  humidity = bme.readHumidity();
+  pressure = bme.readPressure() / 100.0F;
   //altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
   //server.send(200, "text/html", SendHTML(temperature,humidity,pressure,altitude));
-  //server.send(200, "text/html", SendHTML(temperature,humidity,pressure));
-   
+  server.send(200, "text/html", SendHTML(temperature,humidity,pressure)); 
 }
 
 void handle_NotFound(){
