@@ -5,13 +5,14 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1331.h>
-#include <SPI.h>
+//#include <Adafruit_GFX.h>
+//#include <Adafruit_SSD1331.h>
+//#include <SPI.h>
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
-Adafruit_BME280 bme;
+Adafruit_BME280 bme1;
+Adafruit_BME280 bme2;
 
 //float temperature, humidity, pressure, altitude;
 float temperature, humidity, pressure, altitude;
@@ -20,23 +21,24 @@ float temperature, humidity, pressure, altitude;
 const char* ssid = "MM";  // Enter SSID here
 const char* password = "lobstertail1!";  //Enter Password here
 
-//Use Board NodeMCU (esp12-module)
-//Node-MCU ESP8266 GPIO pins and Pin lables
-#define sclk 14 // D5
-#define mosi 13 // D7
-#define cs   15 // D8
-#define rst  16 // D0
-#define dc   2  // D4
-
-// Color definitions
-#define BLACK           0x0000
-#define BLUE            0x001F
-#define RED             0xF800
-#define GREEN           0x07E0
-#define CYAN            0x07FF
-#define MAGENTA         0xF81F
-#define YELLOW          0xFFE0  
-#define WHITE           0xFFFF
+////--Disply--//
+////Use Board NodeMCU (esp12-module)
+////Node-MCU ESP8266 GPIO pins and Pin lables
+//#define sclk 14 // D5
+//#define mosi 13 // D7
+//#define cs   15 // D8
+//#define rst  16 // D0
+//#define dc   2  // D4
+//
+//// Color definitions
+//#define BLACK           0x0000
+//#define BLUE            0x001F
+//#define RED             0xF800
+//#define GREEN           0x07E0
+//#define CYAN            0x07FF
+//#define MAGENTA         0xF81F
+//#define YELLOW          0xFFE0  
+//#define WHITE           0xFFFF
 
 //// 'icons8-temperature-24', 17x18px
 //const unsigned char Thermomiter1 [] PROGMEM = {
@@ -53,7 +55,7 @@ const char* password = "lobstertail1!";  //Enter Password here
 //};
 
 
-Adafruit_SSD1331 display = Adafruit_SSD1331(cs, dc, rst);
+//Adafruit_SSD1331 display = Adafruit_SSD1331(cs, dc, rst);
 
 
 
@@ -66,8 +68,9 @@ void setup() {
   ESP.wdtDisable();
   Serial.begin(115200);
   delay(100);
-  
-  bme.begin(0x76);
+
+  bme1.begin(0x76);
+  bme2.begin(0x77);
   //yield();   
 
   Serial.println("Connecting to ");
@@ -96,16 +99,23 @@ void setup() {
   delay(1);
 }
 void loop() {
+  server.send(200, "text/html", SendHTML(temperature,humidity,pressure));
+  delay(1);
   server.handleClient();
+  delay(1);
+  //display.fillScreen(BLACK);
+  delay(1);
 }
 
 void handle_OnConnect() {
-  temperature = bme.readTemperature();
-  humidity = bme.readHumidity();
-  pressure = bme.readPressure() / 100.0F;
+  temperature = bme1.readTemperature();
+  humidity = bme1.readHumidity();
+  pressure = bme1.readPressure() / 100.0F;
+  delay(1);
   //altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
   //server.send(200, "text/html", SendHTML(temperature,humidity,pressure,altitude));
-  server.send(200, "text/html", SendHTML(temperature,humidity,pressure)); 
+  //server.send(200, "text/html", SendHTML(temperature,humidity,pressure));
+   
 }
 
 void handle_NotFound(){
