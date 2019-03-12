@@ -21,7 +21,7 @@ float temperature, humidity, pressure, altitude;
 const char* ssid = "MM";  // Enter SSID here
 const char* password = "lobstertail1!";  //Enter Password here
 
-char str[5];
+char str[6];
 //char str_temp[5];
 
 ESP8266WebServer server(80);              
@@ -72,7 +72,7 @@ void handle_OnConnect() {
   //server.send(200, "text/html", SendHTML(temperature,humidity,pressure,altitude));
   server.send(200, "text/html", SendHTML(temperature,humidity,pressure)); 
   temperature = bme.readTemperature();
-  sprintf(str, "%.2f", temperature);
+  sprintf(str, "%.2f", temperature);  
   ShowText (str);
   humidity = bme.readHumidity();
   pressure = bme.readPressure() / 100.0F;
@@ -86,7 +86,8 @@ void ShowText (char *temp)
 { 
   ssd1306_setFixedFont(ssd1306xled_font6x8);
   ssd1306_setColor(RGB_COLOR8(255,255,0));
-  ssd1306_printFixed8(0,  0, temp, STYLE_NORMAL);
+  ssd1306_printFixed8(0,  0, "Temp = ", STYLE_NORMAL);
+  ssd1306_printFixed8(42,  0, temp, STYLE_NORMAL);
   
 }
 
