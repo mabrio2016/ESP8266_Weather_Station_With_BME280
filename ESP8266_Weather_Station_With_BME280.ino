@@ -21,6 +21,9 @@ float temperature, humidity, pressure, altitude;
 const char* ssid = "MM";  // Enter SSID here
 const char* password = "lobstertail1!";  //Enter Password here
 
+char str[5];
+//char str_temp[5];
+
 ESP8266WebServer server(80);              
  
 void setup() {
@@ -28,9 +31,9 @@ void setup() {
   ssd1331_96x64_spi_init(16, 15, 02); // Use this line for ESP32 (VSPI)  (gpio16=RST, gpio5=CS for VSPI, gpio17=DC)
   ssd1306_setMode( LCD_MODE_NORMAL );
   ssd1306_clearScreen8();
-  ssd1306_setFixedFont(ssd1306xled_font6x8);
-  ssd1306_setColor(RGB_COLOR8(255,255,0));
-  ssd1306_printFixed8(0,  0, "Marco Test", STYLE_NORMAL);
+//  ssd1306_setFixedFont(ssd1306xled_font6x8);
+//  ssd1306_setColor(RGB_COLOR8(255,255,0));
+//  ssd1306_printFixed8(0,  0, "Marco Test", STYLE_NORMAL);
   
   Serial.begin(115200);
   delay(100);
@@ -62,19 +65,29 @@ void setup() {
 }
 void loop() {
   server.handleClient();
+  handle_OnConnect();
 }
 
 void handle_OnConnect() {
-  temperature = bme.readTemperature();
-  humidity = bme.readHumidity();
-  pressure = bme.readPressure() / 100.0F;
-  //altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
   //server.send(200, "text/html", SendHTML(temperature,humidity,pressure,altitude));
   server.send(200, "text/html", SendHTML(temperature,humidity,pressure)); 
+  temperature = bme.readTemperature();
+  sprintf(str, "%.2f", temperature);
+  ShowText (str);
+  humidity = bme.readHumidity();
+  pressure = bme.readPressure() / 100.0F;
 }
 
 void handle_NotFound(){
-  server.send(404, "text/plain", "Not found");
+  server.send(404, "text/plain", "Not found");  
+}
+
+void ShowText (char *temp)
+{ 
+  ssd1306_setFixedFont(ssd1306xled_font6x8);
+  ssd1306_setColor(RGB_COLOR8(255,255,0));
+  ssd1306_printFixed8(0,  0, temp, STYLE_NORMAL);
+  
 }
 
 //String SendHTML(float temperature,float humidity,float pressure,float altitude){
