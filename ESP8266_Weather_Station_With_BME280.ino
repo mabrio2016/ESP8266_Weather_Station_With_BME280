@@ -22,7 +22,8 @@ const char* ssid = "MM";  // Enter SSID here
 const char* password = "lobstertail1!";  //Enter Password here
 
 char str[6];
-//char str_temp[5];
+char *disp[20];
+
 
 ESP8266WebServer server(80);              
  
@@ -31,7 +32,7 @@ void setup() {
   ssd1331_96x64_spi_init(16, 15, 02); // Use this line for ESP32 (VSPI)  (gpio16=RST, gpio5=CS for VSPI, gpio17=DC)
   ssd1306_setMode( LCD_MODE_NORMAL );
   ssd1306_clearScreen8();
-//  ssd1306_setFixedFont(ssd1306xled_font6x8);
+  ssd1306_setFixedFont(ssd1306xled_font6x8);
 //  ssd1306_setColor(RGB_COLOR8(255,255,0));
 //  ssd1306_printFixed8(0,  0, "Marco Test", STYLE_NORMAL);
   
@@ -72,22 +73,45 @@ void handle_OnConnect() {
   //server.send(200, "text/html", SendHTML(temperature,humidity,pressure,altitude));
   server.send(200, "text/html", SendHTML(temperature,humidity,pressure)); 
   temperature = bme.readTemperature();
-  sprintf(str, "%.2f", temperature);  
-  ShowText (str);
+  sprintf(str, "%.1f", temperature);  
+  ShowText (str, "Temp");
   humidity = bme.readHumidity();
+  sprintf(str, "%.1f", humidity);  
+  ShowText (str, "Humdt");
   pressure = bme.readPressure() / 100.0F;
+  pressure = bme.readPressure() / 100.0F;
+  sprintf(str, "%.1f", pressure);  
+  ShowText (str, "Press");
 }
 
 void handle_NotFound(){
   server.send(404, "text/plain", "Not found");  
 }
 
-void ShowText (char *temp)
+void ShowText (char *value, char *type)
 { 
-  ssd1306_setFixedFont(ssd1306xled_font6x8);
-  ssd1306_setColor(RGB_COLOR8(255,255,0));
-  ssd1306_printFixed8(0,  0, "Temp = ", STYLE_NORMAL);
-  ssd1306_printFixed8(42,  0, temp, STYLE_NORMAL);
+    //ssd1306_setFixedFont(ssd1306xled_font6x8);
+  if (type == "Temp")
+  {
+      //strcat("Temp = ", value);
+      //disp = value + value;
+      ssd1306_setColor(RGB_COLOR8(200,0,0));
+      ssd1306_printFixed8(0,  20, "Tempr = ", STYLE_NORMAL);
+      ssd1306_printFixed8(46, 20, value, STYLE_NORMAL);
+  }
+  if (type == "Humdt")
+  {
+      ssd1306_setColor(RGB_COLOR8(200,200,0));
+      ssd1306_printFixed8(0,  35, "Humdt = ", STYLE_NORMAL);
+      ssd1306_printFixed8(46, 35, value, STYLE_NORMAL);
+  }
+  if (type == "Press")
+  {
+      ssd1306_setColor(RGB_COLOR8(100,100,100));
+      ssd1306_printFixed8(0,  50, "Press = ", STYLE_NORMAL);
+      ssd1306_printFixed8(46, 50, value, STYLE_NORMAL);
+  }
+
   
 }
 
