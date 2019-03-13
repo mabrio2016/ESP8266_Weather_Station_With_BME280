@@ -74,45 +74,53 @@ void handle_OnConnect() {
   server.send(200, "text/html", SendHTML(temperature,humidity,pressure)); 
   temperature = bme.readTemperature();
   sprintf(str, "%.1f", temperature);  
-  ShowText (str, "Temp");
+  ShowText1 (str, "Temp");
   humidity = bme.readHumidity();
   sprintf(str, "%.1f", humidity);  
-  ShowText (str, "Humdt");
+  ShowText1 (str, "Humdt");
   pressure = bme.readPressure() / 100.0F;
   pressure = bme.readPressure() / 100.0F;
   sprintf(str, "%.1f", pressure);  
-  ShowText (str, "Press");
+  ShowText1 (str, "Press");
 }
 
 void handle_NotFound(){
   server.send(404, "text/plain", "Not found");  
 }
 
-void ShowText (char *value, char *type)
+void ShowText1 (char *value, char *type)
 { 
-    //ssd1306_setFixedFont(ssd1306xled_font6x8);
+  ssd1306_setColor(RGB_COLOR8(0,0,250));
+  ssd1306_printFixed8(25,  0, "Inside", STYLE_BOLD);
   if (type == "Temp")
   {
-      //strcat("Temp = ", value);
-      //disp = value + value;
       ssd1306_setColor(RGB_COLOR8(200,0,0));
-      ssd1306_printFixed8(0,  20, "Tempr = ", STYLE_NORMAL);
-      ssd1306_printFixed8(46, 20, value, STYLE_NORMAL);
+      ssd1306_printFixed8(0,  22, "Tempr = ", STYLE_NORMAL);
+      ssd1306_setColor(RGB_COLOR8(250,250,250));
+      ssd1306_printFixed8(50, 22, value, STYLE_NORMAL);
+      ssd1306_printFixed8(80, 22, "F", STYLE_NORMAL);
+      
+      ssd1306_setColor(RGB_COLOR8(200,0,0));
+      ssd1306_printFixed8(0,  33, "Tempr = ", STYLE_NORMAL);
+      ssd1306_setColor(RGB_COLOR8(250,250,250));
+      ssd1306_printFixed8(50, 33, value, STYLE_NORMAL);
+      ssd1306_printFixed8(80, 33, "C", STYLE_NORMAL);
   }
   if (type == "Humdt")
   {
       ssd1306_setColor(RGB_COLOR8(200,200,0));
-      ssd1306_printFixed8(0,  35, "Humdt = ", STYLE_NORMAL);
-      ssd1306_printFixed8(46, 35, value, STYLE_NORMAL);
+      ssd1306_printFixed8(0,  44, "Humdt = ", STYLE_NORMAL);
+      ssd1306_setColor(RGB_COLOR8(250,250,250));
+      ssd1306_printFixed8(50, 44, value, STYLE_NORMAL);
+      ssd1306_printFixed8(80, 44, "%", STYLE_NORMAL);
   }
   if (type == "Press")
   {
       ssd1306_setColor(RGB_COLOR8(100,100,100));
-      ssd1306_printFixed8(0,  50, "Press = ", STYLE_NORMAL);
-      ssd1306_printFixed8(46, 50, value, STYLE_NORMAL);
-  }
-
-  
+      ssd1306_printFixed8(0,  55, "Press = ", STYLE_NORMAL);
+      ssd1306_setColor(RGB_COLOR8(250,250,250));
+      ssd1306_printFixed8(50, 55, value, STYLE_NORMAL);
+  }  
 }
 
 //String SendHTML(float temperature,float humidity,float pressure,float altitude){
