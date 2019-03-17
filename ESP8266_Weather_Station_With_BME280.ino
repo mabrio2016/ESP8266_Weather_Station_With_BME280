@@ -15,7 +15,7 @@ Adafruit_BME280 bme;
 Adafruit_BME280 bme2;
 
 //float temperature, humidity, pressure, altitude;
-float temperature, humidity, pressure, altitude;
+float temperature, Fahrenheit, humidity, pressure, altitude;
 
 /*Put your SSID & Password*/
 const char* ssid = "MM";  // Enter SSID here
@@ -73,12 +73,17 @@ void handle_OnConnect() {
   //server.send(200, "text/html", SendHTML(temperature,humidity,pressure,altitude));
   server.send(200, "text/html", SendHTML(temperature,humidity,pressure)); 
   temperature = bme.readTemperature();
+  //Fahrenheit = ((9 * temperature) / 5.0) + 32;
+  Fahrenheit = ((temperature * 9)/5) + 32;
+  humidity = bme.readHumidity();
+  pressure = bme.readPressure() / 100.0F;
   sprintf(str, "%.1f", temperature);  
-  ShowText1 (str, "Temp");
+  ShowText1 (str, "TempC");
+  sprintf(str, "%.1f", Fahrenheit);  
+  ShowText1 (str, "TempF");
   humidity = bme.readHumidity();
   sprintf(str, "%.1f", humidity);  
   ShowText1 (str, "Humdt");
-  pressure = bme.readPressure() / 100.0F;
   pressure = bme.readPressure() / 100.0F;
   sprintf(str, "%.1f", pressure);  
   ShowText1 (str, "Press");
@@ -92,19 +97,21 @@ void ShowText1 (char *value, char *type)
 { 
   ssd1306_setColor(RGB_COLOR8(0,0,250));
   ssd1306_printFixed8(25,  0, "Inside", STYLE_BOLD);
-  if (type == "Temp")
+  if (type == "TempC")
   {
       ssd1306_setColor(RGB_COLOR8(200,0,0));
-      ssd1306_printFixed8(0,  22, "Tempr = ", STYLE_NORMAL);
-      ssd1306_setColor(RGB_COLOR8(250,250,250));
-      ssd1306_printFixed8(50, 22, value, STYLE_NORMAL);
-      ssd1306_printFixed8(80, 22, "F", STYLE_NORMAL);
-      
-      ssd1306_setColor(RGB_COLOR8(200,0,0));
-      ssd1306_printFixed8(0,  33, "Tempr = ", STYLE_NORMAL);
+      ssd1306_printFixed8(0,  33, "TempC = ", STYLE_NORMAL);
       ssd1306_setColor(RGB_COLOR8(250,250,250));
       ssd1306_printFixed8(50, 33, value, STYLE_NORMAL);
       ssd1306_printFixed8(80, 33, "C", STYLE_NORMAL);
+  }
+  if (type == "TempF")
+  {
+      ssd1306_setColor(RGB_COLOR8(200,0,0));
+      ssd1306_printFixed8(0,  22, "TempF = ", STYLE_NORMAL);
+      ssd1306_setColor(RGB_COLOR8(250,250,250));      
+      ssd1306_printFixed8(50, 22, value, STYLE_NORMAL);
+      ssd1306_printFixed8(80, 22, "F", STYLE_NORMAL);
   }
   if (type == "Humdt")
   {
