@@ -15,7 +15,7 @@ Adafruit_BME280 bme;
 Adafruit_BME280 bme2;
 
 //float temperature, humidity, pressure, altitude;
-float temperature, Fahrenheit, humidity, pressure, altitude;
+float temperature_in, temperature_out, Fahrenheit, humidity, pressure, altitude;
 
 /*Put your SSID & Password*/
 const char* ssid = "MM";  // Enter SSID here
@@ -71,13 +71,13 @@ void loop() {
 
 void handle_OnConnect() {
   //server.send(200, "text/html", SendHTML(temperature,humidity,pressure,altitude));
-  server.send(200, "text/html", SendHTML(temperature,humidity,pressure)); 
-  temperature = bme.readTemperature();
-  //Fahrenheit = ((9 * temperature) / 5.0) + 32;
-  Fahrenheit = ((temperature * 9)/5) + 32;
+  server.send(200, "text/html", SendHTML(temperature_in,humidity,pressure)); 
+  temperature_in = bme.readTemperature();
+  temperature_out = bme2.readTemperature();
+  Fahrenheit = ((temperature_in * 9)/5) + 32;
   humidity = bme.readHumidity();
   pressure = bme.readPressure() / 100.0F;
-  sprintf(str, "%.1f", temperature);  
+  sprintf(str, "%.1f", temperature_in);  
   ShowText1 (str, "TempC");
   sprintf(str, "%.1f", Fahrenheit);  
   ShowText1 (str, "TempF");
@@ -131,7 +131,7 @@ void ShowText1 (char *value, char *type)
 }
 
 //String SendHTML(float temperature,float humidity,float pressure,float altitude){
-String SendHTML(float temperature,float humidity,float pressure){
+String SendHTML(float temperature_in,float humidity,float pressure){
   String ptr = "<!DOCTYPE html>";
   ptr +="<html>";
   ptr +="<head>";
@@ -146,7 +146,7 @@ String SendHTML(float temperature,float humidity,float pressure){
   ptr +=".side-by-side{display: table-cell;vertical-align: middle;position: relative;}";
   ptr +=".text{font-weight: 600;font-size: 19px;width: 200px;}";
   ptr +=".reading{font-weight: 300;font-size: 50px;padding-right: 25px;}";
-  ptr +=".temperature .reading{color: #F29C1F;}";
+  ptr +=".temperature_in .reading{color: #F29C1F;}";
   ptr +=".humidity .reading{color: #3B97D3;}";
   ptr +=".pressure .reading{color: #26B99A;}";
   //ptr +=".altitude .reading{color: #955BA5;}";
@@ -159,7 +159,7 @@ String SendHTML(float temperature,float humidity,float pressure){
   ptr +="<body>";
   ptr +="<h1>ESP8266 Weather Station</h1>";
   ptr +="<div class='container'>";
-  ptr +="<div class='data temperature'>";
+  ptr +="<div class='data temperature_in'>";
   ptr +="<div class='side-by-side icon'>";
   ptr +="<svg enable-background='new 0 0 19.438 54.003'height=54.003px id=Layer_1 version=1.1 viewBox='0 0 19.438 54.003'width=19.438px x=0px xml:space=preserve xmlns=http://www.w3.org/2000/svg xmlns:xlink=http://www.w3.org/1999/xlink y=0px><g><path d='M11.976,8.82v-2h4.084V6.063C16.06,2.715,13.345,0,9.996,0H9.313C5.965,0,3.252,2.715,3.252,6.063v30.982";
   ptr +="C1.261,38.825,0,41.403,0,44.286c0,5.367,4.351,9.718,9.719,9.718c5.368,0,9.719-4.351,9.719-9.718";
@@ -169,8 +169,12 @@ String SendHTML(float temperature,float humidity,float pressure){
   ptr +="</div>";
   ptr +="<div class='side-by-side text'>Celsius</div>";
   ptr +="<div class='side-by-side reading'>";
-  ptr +=(int)temperature;
-  ptr +="<span class='superscript'>&deg;C</span></div>";
+  ptr +=(int)temperature_in;
+  ptr +="<span class='superscript'>&deg;C Inside</span></div>";
+    ptr +="<div class='side-by-side text'>/</div>";
+    ptr +="<div class='side-by-side reading'>";
+    ptr +=(int)temperature_out;
+    ptr +="<span class='superscript'>&deg;C Outside</span></div>";
   ptr +="</div>";
   ptr +="<div class='data temperature'>";
   ptr +="<div class='side-by-side icon'>";
@@ -183,7 +187,11 @@ String SendHTML(float temperature,float humidity,float pressure){
   ptr +="<div class='side-by-side text'>Fahrenheit</div>";
   ptr +="<div class='side-by-side reading'>";
   ptr +=(int)Fahrenheit;
-  ptr +="<span class='superscript'>&deg;C</span></div>";
+  ptr +="<span class='superscript'>&deg;F Inside</span></div>";
+    ptr +="<div class='side-by-side text'>/</div>";
+    ptr +="<div class='side-by-side reading'>";
+    ptr +=(int)Fahrenheit;
+    ptr +="<span class='superscript'>&deg;F Outside</span></div>";
   ptr +="</div>";
   ptr +="<div class='data humidity'>";
   ptr +="<div class='side-by-side icon'>";
@@ -195,7 +203,11 @@ String SendHTML(float temperature,float humidity,float pressure){
   ptr +="<div class='side-by-side text'>Humidity</div>";
   ptr +="<div class='side-by-side reading'>";
   ptr +=(int)humidity;
-  ptr +="<span class='superscript'>%</span></div>";
+  ptr +="<span class='superscript'>% Inside</span></div>";
+    ptr +="<div class='side-by-side text'>/</div>";
+    ptr +="<div class='side-by-side reading'>";
+    ptr +=(int)humidity;
+    ptr +="<span class='superscript'>% Outside</span></div>";
   ptr +="</div>";
   ptr +="<div class='data pressure'>";
   ptr +="<div class='side-by-side icon'>";
@@ -212,7 +224,11 @@ String SendHTML(float temperature,float humidity,float pressure){
   ptr +="<div class='side-by-side text'>Pressure</div>";
   ptr +="<div class='side-by-side reading'>";
   ptr +=(int)pressure;
-  ptr +="<span class='superscript'>hPa</span></div>";
+  ptr +="<span class='superscript'>hPa Inside</span></div>";
+    ptr +="<div class='side-by-side text'>/</div>";
+    ptr +="<div class='side-by-side reading'>";
+    ptr +=(int)pressure;
+    ptr +="<span class='superscript'>hPa Outside</span></div>";
   ptr +="</div>";
   //ptr +="<div class='data altitude'>";
   //  ptr +="<div class='side-by-side icon'>";
