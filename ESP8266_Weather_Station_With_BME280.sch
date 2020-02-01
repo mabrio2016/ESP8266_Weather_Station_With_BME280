@@ -540,6 +540,8 @@ Variant with &lt;b&gt;SPI interface&lt;/b&gt;
 <part name="GND2" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="GND3" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="U$4" library="diy-modules" deviceset="TEMP-HUM-PRES-BME280" device=""/>
+<part name="U$3" library="diy-modules" deviceset="TEMP-HUM-PRES-BME280" device=""/>
+<part name="GND4" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -552,6 +554,8 @@ Variant with &lt;b&gt;SPI interface&lt;/b&gt;
 <instance part="GND2" gate="1" x="81.28" y="-15.24"/>
 <instance part="GND3" gate="1" x="172.72" y="60.96"/>
 <instance part="U$4" gate="G$1" x="106.68" y="0"/>
+<instance part="U$3" gate="G$1" x="106.68" y="-33.02"/>
+<instance part="GND4" gate="1" x="81.28" y="-50.8"/>
 </instances>
 <busses>
 </busses>
@@ -575,6 +579,12 @@ Variant with &lt;b&gt;SPI interface&lt;/b&gt;
 <wire x1="172.72" y1="78.74" x2="172.72" y2="63.5" width="0.1524" layer="91"/>
 <pinref part="GND3" gate="1" pin="GND"/>
 </segment>
+<segment>
+<wire x1="91.44" y1="-30.48" x2="81.28" y2="-30.48" width="0.1524" layer="91"/>
+<pinref part="U$3" gate="G$1" pin="GND"/>
+<pinref part="GND4" gate="1" pin="GND"/>
+<wire x1="81.28" y1="-30.48" x2="81.28" y2="-48.26" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="N$1" class="0">
 <segment>
@@ -583,6 +593,10 @@ Variant with &lt;b&gt;SPI interface&lt;/b&gt;
 <wire x1="76.2" y1="0" x2="76.2" y2="66.04" width="0.1524" layer="91"/>
 <pinref part="U$1" gate="G$1" pin="D1"/>
 <wire x1="76.2" y1="66.04" x2="55.88" y2="66.04" width="0.1524" layer="91"/>
+<pinref part="U$3" gate="G$1" pin="SCL"/>
+<wire x1="91.44" y1="-33.02" x2="76.2" y2="-33.02" width="0.1524" layer="91"/>
+<wire x1="76.2" y1="0" x2="76.2" y2="-33.02" width="0.1524" layer="91"/>
+<junction x="76.2" y="0"/>
 </segment>
 </net>
 <net name="N$2" class="0">
@@ -592,6 +606,10 @@ Variant with &lt;b&gt;SPI interface&lt;/b&gt;
 <wire x1="71.12" y1="-2.54" x2="71.12" y2="63.5" width="0.1524" layer="91"/>
 <pinref part="U$1" gate="G$1" pin="D2"/>
 <wire x1="71.12" y1="63.5" x2="55.88" y2="63.5" width="0.1524" layer="91"/>
+<pinref part="U$3" gate="G$1" pin="SDA"/>
+<wire x1="91.44" y1="-35.56" x2="71.12" y2="-35.56" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="-2.54" x2="71.12" y2="-35.56" width="0.1524" layer="91"/>
+<junction x="71.12" y="-2.54"/>
 </segment>
 </net>
 <net name="N$3" class="0">
@@ -606,6 +624,10 @@ Variant with &lt;b&gt;SPI interface&lt;/b&gt;
 <wire x1="66.04" y1="91.44" x2="134.62" y2="91.44" width="0.1524" layer="91"/>
 <wire x1="134.62" y1="91.44" x2="134.62" y2="73.66" width="0.1524" layer="91"/>
 <junction x="66.04" y="33.02"/>
+<pinref part="U$3" gate="G$1" pin="VIN"/>
+<wire x1="66.04" y1="-27.94" x2="91.44" y2="-27.94" width="0.1524" layer="91"/>
+<wire x1="66.04" y1="5.08" x2="66.04" y2="-27.94" width="0.1524" layer="91"/>
+<junction x="66.04" y="5.08"/>
 </segment>
 </net>
 <net name="N$4" class="0">

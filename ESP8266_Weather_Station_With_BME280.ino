@@ -1,11 +1,11 @@
 
-//Use Board NodeMCU (esp12-module)
+//Use Board NodeMCU 01 (esp-12E Module)
+//Use Library SSD1331.h for 0.95" Inch 7 Pin Colorful 65K SPI OLED Display Module 
 
 #include <ESP8266WebServer.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
-
 #include "ssd1306.h"
 #include "nano_engine.h"
 
@@ -17,9 +17,13 @@ Adafruit_BME280 bme2;
 //float temperature, humidity, pressure, altitude;
 float temperature_in, temperature_out, Fahrenheit_in, Fahrenheit_out, humidity_in, humidity_out, pressure_in, pressure_out;
 
-/*Put your SSID & Password*/
+/*Network IP and credentials*/
 const char* ssid = "MM";  // Enter SSID here
 const char* password = "lobstertail1!";  //Enter Password here
+
+IPAddress ip(192, 168, 1, 54);
+IPAddress gateway(192,168,1,1);   
+IPAddress subnet(255,255,255,0);
 
 char str[6];
 char *disp[20];
@@ -35,19 +39,26 @@ void setup() {
   ssd1306_setMode( LCD_MODE_NORMAL );
   ssd1306_clearScreen8();
   ssd1306_setFixedFont(ssd1306xled_font6x8);
-  //  ssd1306_setColor(RGB_COLOR8(255,255,0));
-  //  ssd1306_printFixed8(0,  0, "Marco Test", STYLE_NORMAL);
+  ssd1306_setColor(RGB_COLOR8(255,255,0));
+  ssd1306_printFixed8(0,  0, "WiFi Connecting", STYLE_NORMAL);
+  ssd1306_printFixed8(0,  20, "NetID =", STYLE_NORMAL);
+  ssd1306_printFixed8(50, 20, ssid, STYLE_NORMAL);
+  ssd1306_printFixed8(0,  30, "IP:192.168.1.54", STYLE_BOLD);
+  
+   
 
   Serial.begin(115200);
   delay(100);
-
-  bme.begin(0x76);
+  
   bme2.begin(0x77);
+  bme.begin(0x76);
 
   Serial.println("Connecting to ");
   Serial.println(ssid);
 
   //connect to your local wi-fi network
+  WiFi.config(ip, gateway, subnet);
+  delay(100);
   WiFi.begin(ssid, password);
 
   //check wi-fi is connected to wi-fi network
@@ -64,8 +75,9 @@ void setup() {
 
   server.begin();
   Serial.println("HTTP server started");
-
+  ssd1306_clearScreen8();
 }
+
 void loop() {
   server.handleClient();
   handle_OnConnect();  
@@ -73,18 +85,19 @@ void loop() {
 
 void handle_OnConnect() {
   server.send(200, "text/html", SendHTML(temperature_in, humidity_in, pressure_in));
-  temperature_in = bme.readTemperature();
-  temperature_out = bme2.readTemperature();
+  temperature_out = bme.readTemperature();
+  delay(100);
+  temperature_in = bme2.readTemperature();
   Fahrenheit_in = ((temperature_in * 9) / 5) + 32;
   Fahrenheit_out = ((temperature_out * 9) / 5) + 32;
-  humidity_in = bme.readHumidity();
-  humidity_out = bme2.readHumidity();
-  pressure_in = bme.readPressure() / 100.0F;
-  pressure_out = bme2.readPressure() / 100.0F;
+  humidity_in = bme2.readHumidity();
+  humidity_out = bme.readHumidity();
+  pressure_in = bme2.readPressure() / 100.0F;
+  pressure_out = bme.readPressure() / 100.0F;
 
   //-- Format values to disply. --//
   buttonState = digitalRead(buttonPin);
-  if (buttonState == HIGH) {
+  if (buttonState == LOW) {
     ssd1306_setColor(RGB_COLOR8(0, 0, 250));
     ssd1306_printFixed8(25,  0, "Outside", STYLE_BOLD);
     sprintf(str, "%.1f", temperature_out);
@@ -98,7 +111,7 @@ void handle_OnConnect() {
   } 
   else {
     ssd1306_setColor(RGB_COLOR8(0, 0, 250));
-    ssd1306_printFixed8(25,  0, "Inside", STYLE_BOLD);
+    ssd1306_printFixed8(25,  0, "Inside ", STYLE_BOLD);
     sprintf(str, "%.1f", temperature_in);
     ShowText1 (str, "TempC");
     sprintf(str, "%.1f", Fahrenheit_in);
@@ -156,7 +169,7 @@ String SendHTML(float temperature, float humidity, float pressure) {
   ptr += "<html>";
   ptr += "<head>";
   ptr += "<meta http-equiv= refresh content= 2 >\n"; // Auto Page Refresh
-  ptr += "<title>ESP8266 Weather Station</title>";
+  ptr += "<title>Breno Weather Station</title>";
   ptr += "<meta name='viewport' content='width=device-width, initial-scale=1.0'>";
   ptr += "<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,600' rel='stylesheet'>";
   ptr += "<style>";
@@ -177,7 +190,7 @@ String SendHTML(float temperature, float humidity, float pressure) {
   ptr += "</style>";
   ptr += "</head>";
   ptr += "<body>";
-  ptr += "<h1>ESP8266 Weather Station</h1>";
+  ptr += "<h1>Breno Weather Station</h1>";
   ptr += "<div class='container'>";
   ptr += "<div class='data temperature'>";
   ptr += "<div class='side-by-side icon'>";
